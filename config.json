@@ -1,0 +1,19 @@
+{
+  "tiktok": {
+    "handle": "velero7171",
+    "privacyLevel": null,
+    "allowComment": null,
+    "musicUsageConfirmed": null
+  },
+  "timezone": "Europe/Paris",
+  "slots": [
+    "12:15",
+    "18:40",
+    "21:20"
+  ],
+  "videos_per_week": 21,
+  "concepts": [
+    "ring_escape",
+    "rings_countdown"
+  ]
+}
