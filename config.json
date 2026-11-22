@@ -1,9 +1,10 @@
 {
   "tiktok": {
     "handle": "velero7171",
-    "privacyLevel": null,
-    "allowComment": null,
-    "musicUsageConfirmed": null
+    "privacyLevel": "PUBLIC_TO_EVERYONE",
+    "allowComment": true,
+    "musicUsageConfirmed": true,
+    "settings_chosen_by_owner": "2026-11-22 : public + commentaires + confirmation musicale acceptée"
   },
   "timezone": "Europe/Paris",
   "slots": [

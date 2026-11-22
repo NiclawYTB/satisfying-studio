@@ -39,10 +39,14 @@ Chaque vidéo produit `.mp4` + `.json` (légende proposée, paramètres). Vérif
 (`ffmpeg -ss 6 -i x.mp4 -frames:v 1 x.png` puis la regarder). Durée attendue : 20-30 s.
 
 ## 4. Héberger puis préparer les brouillons
-1. Créer une release GitHub `week-AAAA-SS` sur le dépôt et y joindre les 21 `.mp4`
-   (`gh release create week-2026-W49 videos/2026-W49/*.mp4 --title "Semaine 49" --notes "auto"`).
-2. Pour chaque vidéo : `vidiq_video_upload` avec l'URL publique
-   `https://github.com/NiclawYTB/satisfying-studio/releases/download/<tag>/<fichier>.mp4` → `uploadId`.
+1. Les releases GitHub sont refusées depuis ces sessions : héberger sur la branche `media` à la place.
+   `git fetch --depth 1 origin media && git worktree add ../media -B media origin/media`, supprimer les
+   anciens `.mp4` (`git rm -q *.mp4`), copier les nouveaux, commit, puis pousser **3 vidéos par push**
+   (`git push origin media`) pour éviter les refus de taille. Réencoder avant si une vidéo dépasse 40 Mo :
+   `ffmpeg -i in.mp4 -c:v libx264 -crf 21 -preset veryfast -c:a copy out.mp4`.
+   URL publique : `https://raw.githubusercontent.com/NiclawYTB/satisfying-studio/media/<fichier>.mp4`
+2. Pour chaque vidéo : `vidiq_video_upload` avec l'URL publique ci-dessus → `uploadId`
+   (vidIQ garde sa propre copie : la branche `media` peut être vidée la semaine suivante).
 3. Pour chaque vidéo : `vidiq_social_post_draft_create`, destination TIKTOK avec le `platformAccountId` donné par
    `vidiq_social_account_list` (compte velero7171), `text` = légende, `media` = [{type: video, id: uploadId}], `publishAt` = créneau
    (heure de Paris, voir `config.json` → `slots`, en ajoutant ±10 min au hasard), et les réglages
@@ -51,11 +55,11 @@ Chaque vidéo produit `.mp4` + `.json` (légende proposée, paramètres). Vérif
 
 ## 5. Demander l'OK (obligatoire)
 Envoyer au propriétaire (SendUserMessage + notification) un résumé court en français :
-lien de la release pour voir les vidéos, tableau jour / heure / concept / légende, crédits vidIQ restants,
+lien de la branche `media` (https://github.com/NiclawYTB/satisfying-studio/tree/media) pour voir les vidéos, tableau jour / heure / concept / légende, crédits vidIQ restants,
 bilan d'analyse en 2-3 lignes. Finir par : « Réponds OK pour tout programmer. »
 **Ne publier qu'après sa réponse OK** dans cette session : alors `vidiq_social_post_publish` pour chaque
 brouillon avec sa `revision`. S'il demande des changements, les faire puis redemander.
 
 ## 6. Enregistrer
 Ajouter les 21 lignes à `data/posted.csv` (date, heure, concept, seed, palette, n_rings, durée, légende,
-postId), committer et pousser (`git push`). Supprimer les `.mp4` locaux (ils restent dans la release).
+postId), committer et pousser (`git push`). Supprimer les `.mp4` locaux.
