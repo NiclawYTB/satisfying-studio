@@ -26,6 +26,7 @@ sauf ce dépôt.
 - Semaines 1-2 (moins de 15 vidéos mesurées) : moitié `ring_escape`, moitié `rings_countdown`.
 - Ensuite : 70 % répartis selon les vues moyennes des concepts, 30 % d'exploration (concept/palette moins testés).
 - Ne jamais mettre deux fois de suite le même concept avec la même palette.
+- Première vidéo publiée le 22/11/2026 : https://www.tiktok.com/@velero52/video/7711128972238638368
 - Graine : nombre aléatoire à 5 chiffres jamais utilisé (vérifier `posted.csv`).
 - Si l'analyse montre qu'un réglage marche nettement mieux (ex. moins d'anneaux, chrono plus court), le forcer
   avec `--set clé=valeur` (voir `make_video.py`).
@@ -48,7 +49,7 @@ Chaque vidéo produit `.mp4` + `.json` (légende proposée, paramètres). Vérif
 2. Pour chaque vidéo : `vidiq_video_upload` avec l'URL publique ci-dessus → `uploadId`
    (vidIQ garde sa propre copie : la branche `media` peut être vidée la semaine suivante).
 3. Pour chaque vidéo : `vidiq_social_post_draft_create`, destination TIKTOK avec le `platformAccountId` donné par
-   `vidiq_social_account_list` (compte velero7171), `text` = légende, `media` = [{type: video, id: uploadId}], `publishAt` = créneau
+   `vidiq_social_account_list` (nom affiché velero7171, pseudo @velero52), `text` = légende, `media` = [{type: video, id: uploadId}], `publishAt` = créneau
    (heure de Paris, voir `config.json` → `slots`, en ajoutant ±10 min au hasard), et les réglages
    `privacyLevel`, `allowComment`, `musicUsageConfirmed` de `config.json`.
    Si vidIQ renvoie une remarque de rythme (pacing), utiliser l'heure qu'il suggère.
@@ -58,7 +59,8 @@ Envoyer au propriétaire (SendUserMessage + notification) un résumé court en f
 lien de la branche `media` (https://github.com/NiclawYTB/satisfying-studio/tree/media) pour voir les vidéos, tableau jour / heure / concept / légende, crédits vidIQ restants,
 bilan d'analyse en 2-3 lignes. Finir par : « Réponds OK pour tout programmer. »
 **Ne publier qu'après sa réponse OK** dans cette session : alors `vidiq_social_post_publish` pour chaque
-brouillon avec sa `revision`. S'il demande des changements, les faire puis redemander.
+brouillon avec sa `revision`. Si des créneaux sont déjà passés quand l'OK arrive, les décaler aux prochains
+créneaux libres avec `vidiq_social_post_draft_update` (nouvelle révision) avant de publier, et le dire. S'il demande des changements, les faire puis redemander.
 
 ## 6. Enregistrer
 Ajouter les 21 lignes à `data/posted.csv` (date, heure, concept, seed, palette, n_rings, durée, légende,
