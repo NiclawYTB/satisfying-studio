@@ -120,7 +120,7 @@ class Mixer:
             self.wet[i0:i0 + k, 0] += s * gl * send
             self.wet[i0:i0 + k, 1] += s * gr * send
 
-    def render(self, wet=0.55, peak=0.5):
+    def render(self, wet=0.55, peak=0.5, lowpass=9000):
         ir_n = int(3.2 * SR)
         out = self.dry.copy()
         for c in range(2):
@@ -129,7 +129,7 @@ class Mixer:
             ir[: int(0.012 * SR)] = 0
             ir /= np.sqrt((ir ** 2).sum())
             out[:, c] += fftconvolve(self.wet[:, c], ir)[: self.n] * wet
-        out = lp(out.T, 9000).T
+        out = lp(out.T, lowpass, 4 if lowpass < 6000 else 2).T
         n = int(self.dur * SR)
         out = out[:n]
         fade = np.clip((self.dur - np.arange(n) / SR) / 0.8, 0, 1)

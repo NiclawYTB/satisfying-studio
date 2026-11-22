@@ -64,6 +64,12 @@ bilan d'analyse en 2-3 lignes. Finir par : « Réponds OK pour tout programmer. 
 brouillon avec sa `revision`. Si des créneaux sont déjà passés quand l'OK arrive, les décaler aux prochains
 créneaux libres avec `vidiq_social_post_draft_update` (nouvelle révision) avant de publier, et le dire. S'il demande des changements, les faire puis redemander.
 
+### Limites constatées
+- TikTok limite les requêtes : publier par paquets de 4 brouillons maximum, attendre 60-75 s entre les paquets
+  si vidIQ renvoie `temporarilyUnavailable`, puis relancer les brouillons concernés (même postId/revision).
+- Sons : Nicolas trouve les aigus agressifs. Ne pas monter les notes au-dessus de ~C6, garder le passe-bas
+  (`Mixer.render(lowpass=...)`), éviter les scintillements très aigus.
+
 ## 6. Enregistrer
 Ajouter les 21 lignes à `data/posted.csv` (date, heure, concept, seed, palette, n_rings, durée, légende,
 postId), committer et pousser (`git push`). Supprimer les `.mp4` locaux.

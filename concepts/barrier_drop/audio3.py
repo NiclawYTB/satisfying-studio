@@ -20,27 +20,22 @@ count = {}
 for h in SIM["hits"]:
     j = count.get(h["k"], 0)
     count[h["k"]] = j + 1
-    pan = (h["x"] - W / 2) / 600
-    m = scale_note(5 + (h["k"] % 3) + 2 * j, BASE)
-    mx.put(kalimba(m, 1.0), V(h["t"]), 0.30, pan)
-    mx.put(pop(m - 12, 0.8), V(h["t"]), 0.10, pan, send=0.2)
+    pan = (h["x"] - W / 2) * 0.6 / 600
+    m = scale_note(2 + (h["k"] % 3) + j, BASE)          # mid register, never shrill
+    mx.put(kalimba(m, 0.35), V(h["t"]), 0.26, pan, send=0.45)
 for b in SIM["breaks"]:
-    pan = (b["x"] - W / 2) / 600
+    pan = (b["x"] - W / 2) * 0.6 / 600
     if b["k"] < NB - 1:
-        mx.put(glass(scale_note(10 - (b["k"] % 6), BASE)), V(b["t"]), 0.17, pan, send=0.6)
-        mx.put(sprinkle(rng, BASE + 24, n=10, spread=0.3), V(b["t"]), 0.11, -pan, send=0.7)
+        mx.put(glass(scale_note(5 - (b["k"] % 4), BASE - 12)), V(b["t"]), 0.15, pan, send=0.6)
+        mx.put(kalimba(scale_note(4, BASE - 12), 0.3), V(b["t"]), 0.12, -pan, send=0.5)
     else:
         for i, s in enumerate((0, 2, 4, 5, 7)):
-            mx.put(glass(scale_note(5 + s, BASE), 4.0), V(b["t"]) + 0.05 * i, 0.15, (i - 2) * 0.25, send=0.7)
-        mx.put(sprinkle(rng, BASE + 24, n=24, spread=0.9, dur=2.6), V(b["t"]), 0.14, 0, send=0.8)
-        mx.put(swell(1.0), V(b["t"]) - 0.35, 0.7)
-        mx.put(pad([BASE, BASE + 4, BASE + 7, BASE + 12], 4.0, 1.6), V(b["t"]), 1.0, 0, send=0.6)
-for w in SIM["walls"]:
-    if w[0] < T_DONE:
-        mx.put(tick(scale_note(2, BASE), 0.5), V(w[0]), 0.10, (w[1] - W / 2) / 600, send=0.3)
-desc = [9, 7, 5, 4, 2, 0]
+            mx.put(glass(scale_note(s, BASE - 12), 4.0), V(b["t"]) + 0.06 * i, 0.12, (i - 2) * 0.2, send=0.7)
+        mx.put(swell(1.0), V(b["t"]) - 0.35, 0.5)
+        mx.put(pad([BASE - 12, BASE - 8, BASE - 5, BASE], 4.0, 1.6), V(b["t"]), 1.0, 0, send=0.6)
+desc = [7, 5, 4, 2, 0, 0]
 for i, f in enumerate(SIM["floor"]):
     vel = float(np.clip(f["vy"] / 1500, 0.3, 1.0))
-    mx.put(kalimba(scale_note(desc[min(i, 5)], BASE), vel), V(f["t"]), 0.26 * vel, (f["x"] - W / 2) / 600)
-write_wav("out/audio.wav", mx.render())
+    mx.put(kalimba(scale_note(desc[min(i, 5)], BASE - 12), 0.3), V(f["t"]), 0.24 * vel, (f["x"] - W / 2) / 900)
+write_wav("out/audio.wav", mx.render(peak=0.45, lowpass=3800))
 print("audio", round(V_END, 2), "s calm")
