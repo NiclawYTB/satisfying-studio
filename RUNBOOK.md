@@ -23,21 +23,23 @@ sauf ce dépôt.
    `data/strategy.md` (ce qui marche, ce qui ne marche pas, décision pour la semaine).
 
 ## 2. Choisir les 21 vidéos
-- Semaines 1-2 (moins de 15 vidéos mesurées) : moitié `ring_escape`, moitié `rings_countdown`.
-- Ensuite : 70 % répartis selon les vues moyennes des concepts, 30 % d'exploration (concept/palette moins testés).
-- Ne jamais mettre deux fois de suite le même concept avec la même palette.
-- Première vidéo publiée le 22/11/2026 : https://www.tiktok.com/@velero52/video/7711128972238638368
+- Règle du propriétaire : **3 jeux différents par jour**, un de chaque : `ring_escape` (le cercle),
+  `barrier_drop` (boule qui casse des barrières de verre), `galton_board` (planche de Galton).
+  L'ordre des créneaux tourne chaque jour pour que chaque jeu passe à chaque heure.
+- Pas de musique : uniquement les sons apaisants de `lib/calm.py` (kalimba, verre, bulles, nappe douce).
+  Ne jamais ajouter de morceau existant (droits d'auteur).
 - Graine : nombre aléatoire à 5 chiffres jamais utilisé (vérifier `posted.csv`).
-- Si l'analyse montre qu'un réglage marche nettement mieux (ex. moins d'anneaux, chrono plus court), le forcer
-  avec `--set clé=valeur` (voir `make_video.py`).
+- Si l'analyse montre qu'un réglage marche nettement mieux (ex. moins d'anneaux, plus de barrières),
+  le forcer avec `--set clé=valeur` (voir `random_params` dans `make_video.py`). Garder quand même 1 vidéo
+  de chaque jeu par jour.
 
 ## 3. Générer
 Par lots de 3 (une commande ≤ 10 min) :
 ```
-python3 make_video.py --concept ring_escape --seed 12345 --out videos/2026-W49/01.mp4
+python3 make_video.py --concept barrier_drop --seed 12345 --out videos/2026-W49/01.mp4
 ```
 Chaque vidéo produit `.mp4` + `.json` (légende proposée, paramètres). Vérifier 1 image d'une vidéo sur 5
-(`ffmpeg -ss 6 -i x.mp4 -frames:v 1 x.png` puis la regarder). Durée attendue : 20-30 s.
+(`ffmpeg -ss 6 -i x.mp4 -frames:v 1 x.png` puis la regarder). Durée attendue : 22-27 s. Rendu : 1 à 2,5 min par vidéo.
 
 ## 4. Héberger puis préparer les brouillons
 1. Les releases GitHub sont refusées depuis ces sessions : héberger sur la branche `media` à la place.

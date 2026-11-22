@@ -162,8 +162,34 @@ def search(seed0, tries=30):
     return best
 
 
+def slow_windows(r):
+    """Slow motion when the ball slips through a gap: the last ring + up to 3 others (chains first)."""
+    esc = [e[0] for e in r["escapes"]]
+    te_f = esc[-1]
+    wins = [(te_f - 0.42, te_f + 0.35, 0.2)]
+    cands = []
+    for i, te in enumerate(esc[:-1]):
+        j = i
+        while j + 1 < len(esc) - 1 and esc[j + 1] - esc[j] < 0.3:
+            j += 1
+        cands.append((j - i + 1, te, esc[j]))
+    picked = []
+    for n, te, ce in sorted(cands, key=lambda c: (-c[0], c[1])):
+        if te < 2.0 or ce > te_f - 3.0:
+            continue
+        if all(abs(te - p[0]) > 4.0 for p in picked):
+            picked.append((te, ce))
+        if len(picked) == int(PRM.get("n_slowmo", 1)):
+            break
+    for te, ce in picked:
+        wins.append((te - 0.25, ce + 0.28, 0.3))
+    return sorted(wins)
+
+
 if __name__ == "__main__":
     r = search(SEED)
+    r["warp_windows"] = slow_windows(r)
+    print("slowmo", [tuple(round(x, 2) for x in w) for w in r["warp_windows"]])
     et = np.array([0] + [e[0] for e in r["escapes"]])
     print("t_esc", r["t_esc"], "bounces", len(r["bounces"]), "floor", len(r["floor"]))
     print("escapes:", [round(e[0], 2) for e in r["escapes"]])

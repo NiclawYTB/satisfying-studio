@@ -10,60 +10,52 @@ Every seed gives different colours, counts, key and pacing.
 import argparse, json, os, random, shutil, subprocess, sys, time
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-CONCEPTS = ["rings_countdown", "ring_escape"]
+CONCEPTS = ["ring_escape", "barrier_drop", "galton_board"]
 
-PALETTES = {
-    "sunset": [[0, [255, 40, 110]], [0.14, [255, 70, 80]], [0.32, [255, 140, 60]], [0.5, [255, 214, 90]],
-               [0.68, [255, 150, 60]], [0.86, [255, 60, 120]], [1, [225, 40, 160]]],
-    "ocean": [[0, [40, 120, 255]], [0.3, [0, 220, 255]], [0.5, [120, 255, 230]], [0.7, [0, 180, 255]],
-              [1, [130, 60, 255]]],
-    "toxic": [[0, [60, 255, 120]], [0.3, [180, 255, 60]], [0.5, [255, 240, 80]], [0.7, [120, 255, 90]],
-              [1, [0, 200, 160]]],
-    "candy": [[0, [255, 80, 200]], [0.3, [190, 90, 255]], [0.5, [110, 170, 255]], [0.7, [200, 100, 255]],
-              [1, [255, 90, 170]]],
-    "fire": [[0, [255, 40, 40]], [0.3, [255, 110, 30]], [0.5, [255, 200, 60]], [0.7, [255, 120, 40]],
-             [1, [220, 30, 60]]],
-    "ice": [[0, [180, 240, 255]], [0.3, [90, 200, 255]], [0.5, [230, 250, 255]], [0.7, [120, 170, 255]],
-            [1, [170, 130, 255]]],
-}
-BALLS = {"sunset": [0.45, 1.0, 0.92], "ocean": [1.0, 0.55, 0.75], "toxic": [1.0, 0.4, 0.9],
-         "candy": [0.5, 1.0, 0.9], "fire": [0.45, 0.9, 1.0], "ice": [1.0, 0.7, 0.3]}
-PROGS = [["Am", "F", "C", "G"], ["Am", "C", "G", "F"], ["Am", "G", "F", "C"]]
-
-HASHTAGS = ["#satisfying", "#satisfyingvideo", "#oddlysatisfying", "#asmr", "#fyp", "#pourtoi",
-            "#relaxing", "#physics", "#neon", "#visualizer"]
+HASHTAGS = ["#satisfying", "#satisfyingvideo", "#oddlysatisfying", "#asmr", "#relaxing", "#calm",
+            "#physics", "#fyp", "#pourtoi"]
 CAPTIONS = {
     "ring_escape": [
         "Elle s'échappe en combien de temps ? ⏱️ Mets ton pronostic 👇",
         "{n} anneaux, 1 seule boule. Elle va y arriver ? 👀",
         "Attends le dernier anneau… 🤯",
         "Devine le chrono final avant la fin ⏱️👇",
-        "Ton cerveau va adorer ce son 🔊",
-        "Moins de {t}s ou plus ? Réponds avant la fin 👇",
+        "Le son quand elle sort… 😮‍💨🔊",
     ],
-    "rings_countdown": [
-        "Le compte à rebours le plus satisfaisant 😮‍💨",
-        "Regarde jusqu'à 0… 🔊 Son à fond",
-        "{n} anneaux détruits en rythme 🎧",
-        "Ça devient incroyable à la fin 🔥",
-        "Chaque impact tombe pile sur le beat 🎶",
+    "barrier_drop": [
+        "{n} barrières de verre… elle va toutes les casser ? 🔨",
+        "Le bruit du verre est trop satisfaisant 🔊",
+        "Combien de rebonds au total ? Réponds avant la fin 👇",
+        "Regarde jusqu'à l'arrivée ✨",
+        "ASMR verre cassé 💎 son à fond",
+    ],
+    "galton_board": [
+        "{n} billes et à la fin… la courbe parfaite 🤯",
+        "Le hasard dessine toujours la même forme 👀",
+        "Regarde jusqu'à la fin, c'est hypnotisant ✨",
+        "La planche de Galton : les maths en vrai 🧠",
+        "Son apaisant 🔊 regarde la courbe se former",
     ],
 }
+KEYS = [-3, -2, 0, 2, 3, 5]
 
 
 def random_params(concept, seed):
     r = random.Random(seed)
-    prm = {"seed": seed, "key_shift": r.choice([-3, -2, 0, 2, 3]), "progression": r.choice(PROGS)}
-    if concept == "rings_countdown":
-        pal = r.choice(list(PALETTES))
-        prm.update(palette_name=pal, palette=PALETTES[pal], ball_color=BALLS[pal],
-                   n_rings=r.randint(135, 165), bpm=r.choice([120, 124, 128, 132]))
-    else:
+    prm = {"seed": seed, "key_shift": r.choice(KEYS)}
+    if concept == "ring_escape":
         prm.update(n_rings=r.randint(15, 22), hue_start=r.random(),
                    hue_span=r.choice([-0.8, 0.8, -0.55, 0.55, -1.0]),
-                   saturation=round(r.uniform(0.74, 0.9), 2), gap_deg=round(r.uniform(33, 38), 1),
+                   saturation=round(r.uniform(0.6, 0.85), 2), gap_deg=round(r.uniform(33, 38), 1),
                    omega=round(r.uniform(2.6, 3.1) * r.choice([1, -1]), 2),
-                   spiral_deg=round(r.uniform(5, 10), 1), target_time=round(r.uniform(18, 24), 1))
+                   spiral_deg=round(r.uniform(5, 10), 1), target_time=round(r.uniform(17, 21), 1),
+                   n_slowmo=1)
+    elif concept == "barrier_drop":
+        prm.update(n_barriers=r.randint(18, 21), hue_start=r.random(), hue_span=r.choice([0.3, 0.45, -0.45, 0.6]),
+                   saturation=round(r.uniform(0.45, 0.65), 2))
+    else:
+        prm.update(hue_start=r.random(), hue_span=r.choice([0.9, -0.9, 0.6, 1.0]),
+                   saturation=round(r.uniform(0.5, 0.7), 2), rate1=r.choice([50, 55, 60]))
     return prm
 
 
@@ -71,8 +63,8 @@ def caption_for(concept, prm, stats, seed):
     r = random.Random(seed * 7 + 1)
     base = r.choice(CAPTIONS[concept])
     t_hint = int(round(stats.get("t_esc", 20) / 5.0) * 5) or 20
-    text = base.format(n=prm.get("n_rings", ""), t=t_hint)
-    tags = ["#satisfying", "#fyp", "#pourtoi"] + r.sample(HASHTAGS[1:5] + HASHTAGS[6:], 3)
+    text = base.format(n=stats.get("n", ""), t=t_hint)
+    tags = ["#satisfying", "#fyp", "#pourtoi"] + r.sample(HASHTAGS[1:7], 3)
     return text + " " + " ".join(dict.fromkeys(tags))
 
 
@@ -108,26 +100,27 @@ def main():
         json.dump(prm, f)
     cdir = os.path.join(ROOT, "concepts", concept)
     env = dict(os.environ, SATISFY_PARAMS=os.path.join(work, "params.json"),
-               SATISFY_FONTS=os.path.join(ROOT, "fonts"), PYTHONPATH=cdir)
+               SATISFY_FONTS=os.path.join(ROOT, "fonts"), PYTHONPATH=cdir + os.pathsep + os.path.join(ROOT, "lib"))
     log = open(os.path.join(work, "log.txt"), "w")
     py = sys.executable
     t0 = time.time()
     stats = {}
-    if concept == "rings_countdown":
-        run([py, os.path.join(cdir, "sim.py")], work, env, log)
-        run([py, os.path.join(cdir, "audio.py")], work, env, log)
-        nf = int(run([py, "-c", "from common import N_FRAMES; print(N_FRAMES)"], work, env, log).split()[-1])
-        renderer = os.path.join(cdir, "render.py")
-        stats["n_rings"] = prm["n_rings"]
-    else:
-        txt = run([py, os.path.join(cdir, "sim2.py")], work, env, log)
-        run([py, os.path.join(cdir, "audio2.py")], work, env, log)
-        renderer = os.path.join(cdir, "render2.py")
-        nf = int(run([py, renderer, "n"], work, env, log).split()[-1])
-        for line in txt.splitlines():
-            if line.startswith("t_esc"):
-                stats["t_esc"] = round(float(line.split()[1]), 2)
-        stats["n_rings"] = prm["n_rings"]
+    scripts = {"ring_escape": ("sim2.py", "audio2.py", "render2.py"),
+               "barrier_drop": ("sim3.py", "audio3.py", "render3.py"),
+               "galton_board": ("sim4.py", "audio4.py", "render4.py")}[concept]
+    txt = run([py, os.path.join(cdir, scripts[0])], work, env, log)
+    run([py, os.path.join(cdir, scripts[1])], work, env, log)
+    renderer = os.path.join(cdir, scripts[2])
+    nf = int(run([py, renderer, "n"], work, env, log).split()[-1])
+    for line in txt.splitlines():
+        if line.startswith("t_esc"):
+            stats["t_esc"] = round(float(line.split()[1]), 2)
+        if line.startswith("balls"):
+            stats["n"] = int(line.split()[1])
+    if concept == "ring_escape":
+        stats["n"] = prm["n_rings"]
+    elif concept == "barrier_drop":
+        stats["n"] = prm["n_barriers"]
     half = nf // 2
     procs = [subprocess.Popen([py, renderer, "seg", str(s), str(e), f"out/seg{i}.mp4"], cwd=work, env=env,
                               stdout=log, stderr=subprocess.STDOUT)

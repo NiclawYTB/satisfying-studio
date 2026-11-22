@@ -7,11 +7,13 @@ import numpy as np
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 from common2 import *
+from timewarp import Warp
 
 SIM = pickle.load(open("sim2.pkl", "rb"))
 T_ESC = SIM["t_esc"]
 T_END = T_ESC + OUTRO
-N_FRAMES = int(T_END * FPS)
+WARP = Warp(SIM.get("warp_windows", []), T_END)
+N_FRAMES = int(float(WARP.v_of_t(T_END)) * FPS)
 PATH = SIM["path"]
 BOUNCES = SIM["bounces"]
 B_T = np.array([b[0] for b in BOUNCES])
@@ -165,7 +167,7 @@ def fmt_time(t):
 
 
 def render(fi):
-    t = fi / FPS
+    t = float(WARP.t_of_v(fi / FPS))
     k_out = escaped(t)
     flat = np.zeros((H * W, 3), dtype=np.float32)
 
@@ -240,6 +242,14 @@ def render(fi):
     add_sprite(img, SP_CORE, bx, by, bcol * 0.8 + 0.2)
     add_sprite(img, SP_HOT, bx, by, WHITE * 0.7)
 
+    # ---- slow-motion zoom towards the ball ----
+    za = float(WARP.slow_amount(t))
+    if za > 0.01:
+        s = 1 + 0.16 * za
+        zx, zy = CX + (bx - CX) * 0.7, CY + (by - CY) * 0.7
+        M = np.float32([[s, 0, (1 - s) * zx], [0, s, (1 - s) * zy]])
+        img = cv2.warpAffine(img, M, (W, H), flags=cv2.INTER_LINEAR)
+
     # ---- counter (top) ----
     left = N_RINGS - k_out
     last = E_T[k_out - 1] if k_out else -10
@@ -271,7 +281,7 @@ def render(fi):
     # ---- tone map ----
     ex = np.maximum(img - 1.0, 0).max(axis=2, keepdims=True)
     img += ex * 0.5
-    fe = np.clip((T_END - t) / 0.4, 0, 1)
+    fe = np.clip((N_FRAMES / FPS - fi / FPS) / 0.4, 0, 1)
     if fe < 1:
         img *= fe
     np.clip(img, 0, 1, out=img)
